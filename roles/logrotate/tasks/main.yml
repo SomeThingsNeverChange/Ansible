@@ -1,0 +1,20 @@
+---
+# tasks file for logrotate
+- name: Configure a logrotate
+  template: 
+    src: logrotate.j2 
+    dest: /etc/logrotate.conf
+
+- name: Find files
+  find:
+   paths: /var/log
+   patterns: ["messages-*", "secure-*", "maillog-*", "spooler-*", "cron-*"]
+   recurse: true
+  register: result
+
+- name: Remove old logs
+  file:
+   path: "{{ item.path }}" 
+   state: absent
+  with_items: "{{ result.files }}"  
+ 
